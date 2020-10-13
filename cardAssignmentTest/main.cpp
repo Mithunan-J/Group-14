@@ -1,6 +1,32 @@
 #include <iostream>
+
+int drawCards(bool hasBeenPulled[18], bool townTurn) {
+	int lowestCardValue;
+	int location;
+	int drawnCard;
+	
+	location = rand() % 3;
+	lowestCardValue = 6 * location;
+
+	if (townTurn) {
+		lowestCardValue = lowestCardValue + 3;
+	}
+
+	draw:
+	drawnCard = lowestCardValue + (rand() % 3);
+
+	if (hasBeenPulled[drawnCard] == false) {
+		return drawnCard;
+	}
+	else {
+		goto draw;
+	}
+}
+
 int main()
 {
+	//variables
+
 	//lists for character cards and their stats
 	std::string cards[18];
 
@@ -23,11 +49,6 @@ int main()
 	cards[15] = "DO";//doctor
 	cards[16] = "ME";//mentor
 	cards[17] = "SC";//scientist
-
-	for (int counter = 0; counter < 18; counter++)
-	{
-		std::cout << cards[counter] << "\n";
-	}
 
 	//card stats
 	int cardstats[18][2]
@@ -52,13 +73,21 @@ int main()
 		{ 5, 4 }//scientist
 	};
 
-	//loop for printing card stats
-	for (int i = 0; i < 2; i++)
-	{
-		for (int x = 0; x < 18; x++)
-		{
-			std::cout << cardstats[x][i] << "  ";
-		}
-		std::cout << "\n";
+	bool hasBeenPulled[18] = { false };
+	bool townTurn = false; //can change as needed, this is a default
+	int currentHand[3];
+	
+	//draws starting hand
+	for (int i = 0; i < 3; i++) {
+		currentHand[i] = drawCards(hasBeenPulled, townTurn);
+		hasBeenPulled[currentHand[i]] = true;
+	}
+	
+	//output hand and stats
+	for (int i = 0; i < 3; i++) {
+		int j = i + 1;
+		std::cout << "Card " << j << ": " << cards[currentHand[i]] << "\n";
+		std::cout << "HP: " << cardstats[currentHand[i]][0] << " Power: " << cardstats[currentHand[i]][1];
+		std::cout << "\n \n";
 	}
 }
