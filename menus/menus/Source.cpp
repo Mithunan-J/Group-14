@@ -12,18 +12,20 @@ void story()
 	int peoples;
 	int type;
 	int persons;
-	
+	restartone:
 	cout << "Would you like to see townies or terrors?" << endl;
-<<<<<<< HEAD
+
 	peoples = _getch();
 
-	if (peoples == 49)
-	{
+	if (peoples == 50)
+	{	
+		restarttwo:
 		cout << "\n\nWhich type of Terror would you like to learn about?\n1: Power\n2: Speed\n3: Support\n\n";
 		type = _getch();
 
 		if (type == 49)
 		{
+			restartthree:
 			cout << "\n\nWhich Terror would you like to learn about?\n1: Amalgam\n2: Wolfman\n3: Zombie\n\n";
 			persons = _getch(); //lets see
 
@@ -42,11 +44,13 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restartthree;
 			}
 		}
 
 		else if (type == 50)
 		{
+			restartfour:
 			std::cout << "\n\nWhich terror would you like to learn about?\n1: Vampire\n2: Ghost\n3: Shifter\n\n";
 			persons = _getch();
 
@@ -65,11 +69,13 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restartfour;
 			}
 		}
 
 		else if (type == 51)
 		{
+			restartfive:
 			std::cout << "\n\nWhich Terror would you like to learn about?\n1: Reaper\n2: Banshee\n3: Witch\n\n";
 			persons = _getch();
 
@@ -88,20 +94,24 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restartfive;
 			}
 		}
 		else
 		{
 			cout << "That was not a correct choice.\n\n";
+			goto restarttwo;
 		}
 	}
-	else if (peoples == 50)
+	else if (peoples == 49)
 	{
+		restartsix:
 		std::cout << "\n\nWhich type of Townie would you like to learn about?\n1: Power\n2: Speed\n3: Support\n\n";
 		type = _getch();
 
 		if (type == 49)
 		{
+			restartseven:
 			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Detective\n2: Lover\n3: Noble\n\n";
 			persons = _getch();
 
@@ -120,10 +130,12 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restartseven;
 			}
 		}
 		else if (type == 50)
 		{
+			restarteight:
 			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Beauty\n2: Dancer\n3: Student\n\n";
 			persons = _getch();
 
@@ -142,10 +154,12 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restarteight;
 			}
 		}
 		else if (type == 51)
 		{
+			restartnine:
 			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Scientist\n2: Mentor\n3: Doctor\n\n";
 			persons = _getch();
 
@@ -164,22 +178,24 @@ void story()
 			else
 			{
 				cout << "That was not a correct choice.\n\n";
+				goto restartnine;
 			}
 		}
 		else
 		{
 			cout << "That was not a correct choice.\n\n";
+			goto restartsix;
 		}
 	}
 	else
 	{
 	cout << "That was not a correct choice.\n\n";
+	goto restartone;
 	}
 
-=======
-	people = _getch();
+
+	persons = _getch();
 	//cout << people;
->>>>>>> main
 }
 
 int main() 
