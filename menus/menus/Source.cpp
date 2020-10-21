@@ -15,7 +15,7 @@ void story()
 	
 	cout << "Would you like to see townies or terrors?" << endl;
 	people = _getch();
-	cout << people;
+	//cout << people;
 }
 
 int main() 
