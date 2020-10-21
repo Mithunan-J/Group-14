@@ -14,7 +14,10 @@ void story()
 	int persons;
 	restartone:
 	cout << "Would you like to see townies or terrors?" << endl;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	peoples = _getch();
 
 	if (peoples == 50)
@@ -193,9 +196,12 @@ void story()
 	goto restartone;
 	}
 
+<<<<<<< Updated upstream
 
 	persons = _getch();
 	//cout << people;
+=======
+>>>>>>> Stashed changes
 }
 
 int main() 
