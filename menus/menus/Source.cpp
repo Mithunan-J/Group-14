@@ -14,6 +14,7 @@ void story()
 	int persons;
 	
 	cout << "Would you like to see townies or terrors?" << endl;
+<<<<<<< HEAD
 	peoples = _getch();
 
 	if (peoples == 49)
@@ -175,6 +176,10 @@ void story()
 	cout << "That was not a correct choice.\n\n";
 	}
 
+=======
+	people = _getch();
+	//cout << people;
+>>>>>>> main
 }
 
 int main() 
