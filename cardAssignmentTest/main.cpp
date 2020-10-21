@@ -1,5 +1,9 @@
 #include <iostream>
 
+bool specialPoint = true;
+bool strengthBoost = false;
+int actionPoint = 3;
+
 int drawCards(bool hasBeenPulled[18], bool townTurn) {
 	int lowestCardValue;
 	int location;
@@ -22,6 +26,104 @@ int drawCards(bool hasBeenPulled[18], bool townTurn) {
 		goto draw;
 	}
 }
+
+bool SpecialActionCheck() { return specialPoint; }
+
+void SpecialAction(std::string cardOne, std::string cardTwo, std::string cardThree)
+{
+	std::cout << cardOne << " " << cardTwo << " " << cardThree;
+	std::string select;
+	if (SpecialActionCheck)
+	{
+		std::cout << "\n\nWhich card will preform the special action?\nEnter 'back' to cancel the special action.\n\n";
+		std::cin >> select;
+		if (select == cardOne)
+		{
+			//check class type somehow
+			//if(speedType)
+			//{
+				//call specialMovement();
+				//(it would be the same movement function but we can pass in the character that is moveing and skip a few steps)
+				//(also this function would not subtract one from action points)
+				specialPoint = false;
+				return;
+			//}
+
+			//check class type somehow
+			//if(powerType)
+			//{
+				strengthBoost = true;
+				//if true, stength boost will add one at the end of next roll then be set to false
+				specialPoint = false;
+				return;
+			//}
+
+			//check class type somehow
+			//if(supportType)
+			//{
+				//if(cardThree'sHealth > 1)
+				//{
+					//cardThree'sHealth --;
+				chooseHeal:
+				invalid:
+					//std::cout << "\n\nWhich card would you like to give health to?\nEnter back to cancel\n\n";
+					//std::cin >> select;
+					if (select == cardOne)
+					{
+						//if(cardOneHealth < MAXHEALTH)
+						//{
+							//cardOneHealth++;
+						//}
+						//else
+						//{
+						std::cout << "\n\nThis character is already at full health, please choose another.\n\n";
+						goto chooseHeal;
+						//}
+					}
+					else if (select == cardTwo)
+					{
+						//if(cardTwoHealth < MAXHEALTH)
+						//{
+							//cardTwoHealth++;
+						//}
+						//else
+						//{
+						std::cout << "\n\nThis character is already at full health, please choose another.\n\n";
+						goto chooseHeal;
+						//}
+					}
+					else
+					{
+						std::cout << "\n\nNot a valid selection, please try again.\n\n";
+						goto invalid;
+					}
+				//}
+				
+				specialPoint = false;
+				return;
+				//}
+
+
+		}
+		else if (select == cardTwo)
+		{
+
+		}
+		else if (select == cardThree)
+		{
+
+		}
+		else if (select == "back")
+		{
+			return;
+		}
+	}
+
+	
+
+}
+
+
 
 int main()
 {
@@ -76,13 +178,13 @@ int main()
 	bool hasBeenPulled[18] = { false };
 	bool townTurn = false; //can change as needed, this is a default
 	int currentHand[3];
-	
+
 	//draws starting hand
 	for (int i = 0; i < 3; i++) {
 		currentHand[i] = drawCards(hasBeenPulled, townTurn);
 		hasBeenPulled[currentHand[i]] = true;
 	}
-	
+
 	//output hand and stats
 	for (int i = 0; i < 3; i++) {
 		int j = i + 1;
@@ -90,4 +192,7 @@ int main()
 		std::cout << "HP: " << cardstats[currentHand[i]][0] << " Power: " << cardstats[currentHand[i]][1];
 		std::cout << "\n \n";
 	}
+
+
 }
+

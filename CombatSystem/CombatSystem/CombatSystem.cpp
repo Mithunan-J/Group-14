@@ -4,8 +4,10 @@
 #include <iostream>
 #include <time.h>
 #include <cstdlib>
+#include <windows.h>
 int rollDice();//function designed to simulate a dice roll
 void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength);//function designed to simulate a battle between two cards
+void SetColor(int);
 int main()
 {
     int doctorHealth = 4;//test case
@@ -30,6 +32,11 @@ int rollDice()
     return diceFacingUp;
 }
 
+void SetColor(int value)
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
+}
+
 void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength)
 {
     //card1 represents the cards of the player who initiated the battle
@@ -44,6 +51,7 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
     {
         if (p1Attacking == true)
         {
+            SetColor(11);
             diceRoll = rollDice();
             std::cout << "Player 1's Turn\n";
             std::cout << "Number rolled: " << diceRoll << "\n";
@@ -63,6 +71,7 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
         }
         else if (p2Attacking == true)
         {
+            SetColor(5);
             diceRoll = rollDice();
             std::cout << "Player 2's Turn\n";
             std::cout << "Number rolled: " << diceRoll << "\n";
