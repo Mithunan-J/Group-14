@@ -262,106 +262,85 @@ beginning:
 
 
 
-//
-//bool specialPoint = true;
-//bool strengthBoost = false;
-//int actionPoint = 3;
-//
-//
-//bool SpecialActionCheck() { return specialPoint; }
-//
-//void SpecialAction(std::string cardOne, std::string cardTwo, std::string cardThree)
-//{
-//	std::cout << cardOne << " " << cardTwo << " " << cardThree;
-//	std::string select;
-//	if (SpecialActionCheck)
-//	{
-//		std::cout << "\n\nWhich card will preform the special action?\nEnter 'back' to cancel the special action.\n\n";
-//		std::cin >> select;
-//		if (select == cardOne)
-//		{
-//			//check class type somehow
-//			//if(speedType)
-//			//{
-//				//call specialMovement();
-//				//(it would be the same movement function but we can pass in the character that is moveing and skip a few steps)
-//				//(also this function would not subtract one from action points)
-//				specialPoint = false;
-//				return;
-//			//}
-//
-//			//check class type somehow
-//			//if(powerType)
-//			//{
-//				strengthBoost = true;
-//				//if true, stength boost will add one at the end of next roll then be set to false
-//				specialPoint = false;
-//				return;
-//			//}
-//
-//			//check class type somehow
-//			//if(supportType)
-//			//{
-//				//if(cardThree'sHealth > 1)
-//				//{
-//					//cardThree'sHealth --;
-//				chooseHeal:
-//				invalid:
-//					//std::cout << "\n\nWhich card would you like to give health to?\nEnter back to cancel\n\n";
-//					//std::cin >> select;
-//					if (select == cardOne)
-//					{
-//						//if(cardOneHealth < MAXHEALTH)
-//						//{
-//							//cardOneHealth++;
-//						//}
-//						//else
-//						//{
-//						std::cout << "\n\nThis character is already at full health, please choose another.\n\n";
-//						goto chooseHeal;
-//						//}
-//					}
-//					else if (select == cardTwo)
-//					{
-//						//if(cardTwoHealth < MAXHEALTH)
-//						//{
-//							//cardTwoHealth++;
-//						//}
-//						//else
-//						//{
-//						std::cout << "\n\nThis character is already at full health, please choose another.\n\n";
-//						goto chooseHeal;
-//						//}
-//					}
-//					else
-//					{
-//						std::cout << "\n\nNot a valid selection, please try again.\n\n";
-//						goto invalid;
-//					}
-//				//}
-//				
-//				specialPoint = false;
-//				return;
-//				//}
-//
-//
-//		}
-//		else if (select == cardTwo)
-//		{
-//
-//		}
-//		else if (select == cardThree)
-//		{
-//
-//		}
-//		else if (select == "back")
-//		{
-//			return;
-//		}
-//	}
-//
-//}
-//
+
+
+
+
+int SpecialActionSelect(int hand[3], bool townTurn)
+{
+	std::cout << "\n\nWhich card will preform the special action?\nEnter 'back' to cancel the special action.\n\n";
+	int select;
+	std::cin >> select;
+	int card = hand[select];
+	return card;
+}
+
+bool PowerMove(int cardReference, bool hasBoosted)
+{
+	if (!hasBoosted)
+	{
+		hasBoosted = true;
+	}
+	//if true, stength boost will add one at the end of next roll then be set to false
+	return hasBoosted;
+}
+
+//speed special action function goes here
+
+int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::string cards[18])
+{
+	bool canBeHealed[3]{false};
+	if (cardstats[cardReference][0] == 1)
+	{
+		std::cout << "This card has no health to give.\n\n";
+		return -1;
+	}
+	reheal:
+	std::cout << "Which card would you like to heal?\n\n";
+	for(int count = 0; count < 3; count++)
+	{
+		if (hand[count] != cardReference)
+		{
+			if (cardstats[hand[count]][0] < cardstats[hand[count]][2])
+			{
+				std::cout << count + 1 << ": " << cards[hand[count]] << "\n";
+				canBeHealed[count] = true;
+			}
+			else
+			{
+				std::cout << count + 1 << ": This card is already at full health"  << "\n";
+			}
+		}
+		else
+		{
+			std::cout << count + 1 << ": This card is performing the special action and cannot be selected" << "\n";
+		}
+	}
+	int select;
+	std::cin >> select;
+	if (!canBeHealed[select])
+	{
+		std::cout << "\nThis action cannot be preformed on this card, please select another.\n";
+		goto reheal;
+	}
+	else 
+	{
+		return hand[select];
+	}
+
+
+	
+}
+
+void SupportMove(int& supportCard, int& patient)
+{
+	supportCard--;
+	patient++;
+}
+
+
+
+
 
 
 //this function checks to see if the specified position (NOT the values around it) is unavaillable
@@ -638,26 +617,26 @@ int main()
 	cards[17] = "SC";//scientist
 
 	//card stats
-	int cardstats[18][2]
+	int cardstats[18][3]
 	{
-		{ 4, 5 }, //amalg
-		{ 3, 4 },//wolf
-		{ 2, 3 },//zombie
-		{ 2, 2 },//ghost
-		{ 3, 3 },//shift
-		{ 4, 4 },//vamp
-		{ 3, 2 },//banshee
-		{ 5, 4 },//reaper
-		{ 4, 3 },//witch
-		{ 4, 5 },//detec
-		{ 3, 4 },//lover
-		{ 2, 3 },//noble
-		{ 4, 4 },//beauty
-		{ 2, 2 },//dancer
-		{ 3, 3 },//stud
-		{ 4, 3 },//doctor
-		{ 3, 2 },//mentor
-		{ 5, 4 }//scientist
+		{ 4, 5, 4 }, //amalg
+		{ 3, 4, 3 },//wolf
+		{ 2, 3, 2 },//zombie
+		{ 2, 2, 2 },//ghost
+		{ 3, 3, 3 },//shift
+		{ 4, 4, 4 },//vamp
+		{ 3, 2, 3 },//banshee
+		{ 5, 4, 5 },//reaper
+		{ 4, 3, 4 },//witch
+		{ 4, 5, 4 },//detec
+		{ 3, 4, 3 },//lover
+		{ 2, 3, 2 },//noble
+		{ 4, 4, 4 },//beauty
+		{ 2, 2, 2 },//dancer
+		{ 3, 3, 3 },//stud
+		{ 4, 3, 4 },//doctor
+		{ 3, 2, 3 },//mentor
+		{ 5, 4, 5 }//scientist
 	};
 	
 	int board[7][13]{
@@ -680,6 +659,8 @@ int main()
 	int movesRemaining = 3;
 	bool hasUsedSpecial = false;//default, feel free to modify/replace
 	bool actionsOver = false;
+	bool townBoost = false;
+	bool terrBoost = false;
 
 
 	//setup game
@@ -774,8 +755,56 @@ int main()
 
 		case 2:
 			if (!hasUsedSpecial) {
-				//replace with code for special actions
-				std::cout << "Your special would be selected and used here!\n";
+				int specialCard;
+				selectSpecial:
+				if (townTurn)
+				{
+					specialCard = SpecialActionSelect(townHand, townTurn);
+				}
+				else
+				{
+					specialCard = SpecialActionSelect(terrHand, townTurn);
+				}
+				std::cout << "\n" << specialCard << "\n";
+				int cardReference = specialCard;
+				if (townTurn) { specialCard -= 9; }
+				if (specialCard < 3)
+				{
+					if (townTurn)
+					{
+						townBoost =  PowerMove(cardReference, townBoost);
+					}
+					else
+					{
+						terrBoost = PowerMove(cardReference, terrBoost);
+					}
+				}
+				else if (specialCard < 6)
+				{
+					//speed function call
+				}
+				else
+				{
+					
+					if (townTurn)
+					{
+						int patient = ChoosePatient(cardstats, townHand, cardReference, cards);
+						if (patient == -1)
+						{
+							goto selectSpecial;
+						}
+						SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
+					}
+					else
+					{
+						int patient = ChoosePatient(cardstats, terrHand, cardReference, cards);
+						if (patient == -1)
+						{
+							goto selectSpecial;
+						}
+						SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
+					}
+				}
 				hasUsedSpecial = true;
 			}
 			else {
