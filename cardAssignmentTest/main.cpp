@@ -200,44 +200,45 @@ restartone:
 
 	persons = _getch();
 	//cout << people;
-}
+} */
 
-int main()
+void menu()
 {
-	std::string ask;
+	int ask;
 	int hold = 1;
-	cout << "Townies and Terrors" << endl << endl;
+	std::cout << "Townies and Terrors \n \n";
 
 	//asks users where they would like to go
-	cout << "Please enter where you would like to go" << endl;
-	cout << "play" << endl << endl << "info" << endl << endl << "quit" << endl;
-	cin >> ask;
+	std::cout << "Please enter where you would like to go \n";
+	std::cout << "1: play \n \n 2: info  \n \n 3: quit \n";
+	ask = _getch();
 
 	while (hold != 0)
 	{
-		if (ask == "play")
+		if (ask == 49)
 		{
 			hold = 0;
+			exit;
 		}
-		else if (ask == "info")
+		else if (ask == 50)
 		{
-			story();
+			//story();
 			hold = 0;
 		}
-		else if (ask == "quit")
+		else if (ask == 51)
 		{
 			hold = 0;
 			exit;
 		}
 		else
 		{
-			cout << "Please enter one of the options";
-			cin >> ask;
+			std::cout << "Please enter one of the options";
+			ask = _getch();
 		}
 	}
 }
 //hehehehee sneaky comment
-*/
+
 
 
 
@@ -590,6 +591,8 @@ int drawCards(bool hasBeenPulled[18], bool townTurn) {
 
 int main()
 {
+
+	menu();
 	//variables
 
 	//lists for character cards and their stats
