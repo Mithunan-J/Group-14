@@ -1,14 +1,94 @@
 #include <iostream>
 #include <ctime>
 #include <conio.h>
+#include <windows.h>
+#include <cstdlib>
 
 
+int rollDice()
+{
+	int diceFacingUp;//elaborate variable name to avoid plagiarism
+	srand(time(0) + rand());//not exactly sure what's goingg on here but it works.
 
+	diceFacingUp = rand() % 7;//ensures that the random number is between 0 and 6
+	while (diceFacingUp == 0)//if the value of diceFacingUp is 0, it will be rerolled until it is not zero
+	{
+		diceFacingUp = rand() % 7;
+	}
+	return diceFacingUp;
+}
 
+void SetColor(int value)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
+}
+
+void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength)
+{
+	//card1 represents the cards of the player who initiated the battle
+	//card2 represents the cards of the player who is being attacked
+	//the stats of the player who initiated the battle should always be written in the first 2 parameters(CONTINUED)
+	//while the stats of the player being attacked should be written in the last 2 parameters
+	bool p1Attacking = true;//used to decide which player is rolling the dice.
+	bool p2Attacking = false;//used to decide which player is rolling the dice.
+	bool battleEnd = false;
+	int diceRoll;
+	while (battleEnd == false)
+	{
+		if (p1Attacking == true)
+		{
+			SetColor(11);
+			diceRoll = rollDice();
+			std::cout << "Player 1's Turn\n";
+			std::cout << "Number rolled: " << diceRoll << "\n";
+			if (diceRoll >= card2Strength)//checks to see if the number rolled by the player is greater or equal to the opposing card's strength
+			{
+				card2Health -= 1;
+				std::cout << "Card1 deals damage to Card2\n";
+				std::cout << "Card1 health: " << card1Health << " Card1 Strength: " << card1Strength << "\n";
+				std::cout << "Card2 health: " << card2Health << " Card2 Strength: " << card2Strength << "\n";
+			}
+			else
+			{
+				std::cout << "No damage done\n";
+			}
+			p1Attacking = false;
+			p2Attacking = true;
+		}
+		else if (p2Attacking == true)
+		{
+			SetColor(5);
+			diceRoll = rollDice();
+			std::cout << "Player 2's Turn\n";
+			std::cout << "Number rolled: " << diceRoll << "\n";
+			if (diceRoll >= card1Strength)
+			{
+				card1Health -= 1;
+				std::cout << "Card2 deals damage to Card1\n";
+				std::cout << "Card1 health: " << card1Health << " Card1 Strength: " << card1Strength << "\n";
+				std::cout << "Card2 health: " << card2Health << " Card2 Strength: " << card2Strength << "\n";
+			}
+			else
+			{
+				std::cout << "No damage done\n";
+			}
+			p1Attacking = true;
+			p2Attacking = false;
+		}
+		if (card1Health <= 0)
+		{
+			std::cout << "Player2 wins\n";
+			battleEnd = true;
+		}
+		if (card2Health <= 0)
+		{
+			std::cout << "Player1 wins\n";
+			battleEnd = true;
+		}
+	}
+}
 
 // declares functions for the game and info
-
-
 void story()
 {
 	int peoples;
@@ -235,7 +315,7 @@ beginning:
 		if (ask == 49)
 		{
 			
-			exit;
+			hold = 0;
 		}
 		else if (ask == 50)
 		{
@@ -258,20 +338,44 @@ beginning:
 //hehehehee sneaky comment
 
 
-
-
-
-
-
-
-
-
-int SpecialActionSelect(int hand[3], bool townTurn)
+int SpecialActionSelect(int hand[3], std::string cards[18], bool townTurn)
 {
-	std::cout << "\n\nWhich card will preform the special action?\nEnter 'back' to cancel the special action.\n\n";
+	bool canDoSpecialAction[3]{ false };
+	int card;
 	int select;
-	std::cin >> select;
-	int card = hand[select];
+
+enterChoice:
+	std::cout << "\n\nWhich card will perform the special action?\n";
+	for (int i = 0; i < 3; i++) {
+		if (hand[i] > -1) {
+			std::cout << i + 1 << ": " << cards[hand[i]] << "\n";
+			canDoSpecialAction[i] = true;
+		}
+		else {
+			std::cout << "[Empty Slot, cannot select]\n";
+		}
+	}
+	std::cout << "Press 4 to go back";
+	
+	select = _getch();
+
+	select -= 49;
+
+	if (select == 3) {
+		card = -1;
+	}
+	else if (select < 3 && select > -1) {
+		if (canDoSpecialAction[select]) {
+			card = hand[select];
+		}
+		else {
+			goto enterChoice;
+		}
+	}
+	else {
+		goto enterChoice;
+	}
+	
 	return card;
 }
 
@@ -317,7 +421,8 @@ int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::str
 		}
 	}
 	int select;
-	std::cin >> select;
+	select = _getch();
+	select -= 49;
 	if (!canBeHealed[select])
 	{
 		std::cout << "\nThis action cannot be preformed on this card, please select another.\n";
@@ -339,16 +444,12 @@ void SupportMove(int& supportCard, int& patient)
 }
 
 
-
-
-
-
 //this function checks to see if the specified position (NOT the values around it) is unavaillable
 //it returns false if it is availlable and true if it is not
 bool checkSingleDirection(int pos[2], int board[7][13], bool townTurn) {
 	
 	if (!townTurn) {
-		if (board[pos[0]][pos[1]] > 8 && board[pos[0]][pos[1]] < 19) {
+		if (board[pos[0]][pos[1]] > 8 && board[pos[0]][pos[1]] < 19 && pos[1]!= 1 && pos[1]!= 12) {
 			return false;
 		}
 		else {
@@ -436,10 +537,10 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 		if (board[pos[0] - 1][pos[1]] < 9 || board[pos[0] - 1][pos[1]] == 18) {
 			return false;
 		}
-		else if (board[pos[0]][pos[1] - 1] < 9 || board[pos[0]][pos[1] - 1] == 18) {
+		else if ((board[pos[0]][pos[1] - 1] < 9 || board[pos[0]][pos[1] - 1] == 18) && pos[1]!= 2) {
 			return false;
 		}
-		else if (board[pos[0]][pos[1] + 1] < 9 || board[pos[0]][pos[1] + 1] == 18) {
+		else if ((board[pos[0]][pos[1] + 1] < 9 || board[pos[0]][pos[1] + 1] == 18) && pos[1] < 11) {
 			return false;
 		}
 		else if (board[pos[0] + 1][pos[1]] < 9 || board[pos[0] + 1][pos[1]] == 18) {
@@ -452,10 +553,10 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 		if (board[pos[0] - 1][pos[1]] > 8 && board[pos[0] - 1][pos[1]] < 19) {
 			return false;
 		}
-		else if (board[pos[0]][pos[1] - 1] > 8 && board[pos[0]][pos[1] - 1] < 19) {
+		else if (board[pos[0]][pos[1] - 1] > 8 && board[pos[0]][pos[1] - 1] < 19 && pos[1] > 3) {
 			return false;
 		}
-		else if (board[pos[0]][pos[1] + 1] > 8 && board[pos[0]][pos[1] + 1] < 19) {
+		else if (board[pos[0]][pos[1] + 1] > 8 && board[pos[0]][pos[1] + 1] < 19 && pos[1] < 10) {
 			return false;
 		}
 		else if (board[pos[0] + 1][pos[1]] > 8 && board[pos[0] + 1][pos[1]] < 19) {
@@ -471,7 +572,7 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 //this card must be in the player's hand and be able to move in at least one direction on the board
 //this function WILL need modification later someone please remind me
 int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool townTurn) {
-	int count = 1;
+	bool canSelect[3]{ false };
 	int input;
 	bool invalidEntry = true;
 	int pos[2];
@@ -481,8 +582,11 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 
 	for (int i = 0; i < 3; i++) {
 		if (hand[i] != -1) {
-			std::cout << count << ": " << cards[hand[i]] << "\n";
-			count++;
+			std::cout << i+1 << ": " << cards[hand[i]] << "\n";
+			canSelect[i] = true;
+		}
+		else {
+			std::cout << "[Empty Slot, cannot select]\n";
 		}
 	}
 
@@ -492,7 +596,7 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 		input = _getch();
 		input = input - 49;
 
-		if (input < 0 || input > count - 1) {
+		if (input < 0 || input > 2|| canSelect[input] == false) {
 			goto getInput;
 		}
 
@@ -507,6 +611,9 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 				}
 			}
 		}
+
+
+		
 
 		//checks to see if that character is UNABLE to move
 		invalidEntry = checkIfTrapped(board, pos, townTurn);
@@ -539,6 +646,7 @@ void printBoard(int board[7][13]) {
 	symbols[15] = "DO";//doctor
 	symbols[16] = "ME";//mentor
 	symbols[17] = "SC";//scientist
+
 	symbols[18] = "__";//unoccupied space
 	symbols[19] = "||";//wall placed by user
 	symbols[20] = "  ";//outside edge
@@ -568,22 +676,37 @@ void printBoard(int board[7][13]) {
 //the value (0-17) of the card drawn is returned
 int drawCards(bool hasBeenPulled[18], bool townTurn) {
 	int lowestCardValue = 0;
+	int highest = 9;
 	int drawnCard;
+	bool allCardsDrawn = true;
 
 	if (townTurn) {
 		lowestCardValue += 9;
+		highest += 9;
 	}
 
-	draw:
-	srand((unsigned)time(0));
-	drawnCard = lowestCardValue + (rand() % 9);
+	for (int i = lowestCardValue; i < highest; i++) {
+		if (hasBeenPulled[i] == false) {
+			allCardsDrawn = false;
+		}
+	}
 
-	if (hasBeenPulled[drawnCard] == false) {
-		return drawnCard;
+	if (!allCardsDrawn) {
+		draw:
+		srand((unsigned)time(0));
+		drawnCard = lowestCardValue + (rand() % 9);
+
+		if (hasBeenPulled[drawnCard] == false) {
+			return drawnCard;
+		}
+		else {
+			goto draw;
+		}
 	}
 	else {
-		goto draw;
+		return -1;
 	}
+	
 }
 
 int main()
@@ -739,12 +862,80 @@ int main()
 				}
 
 				if (board[pos[0]][pos[1]] != 18) {
-					//placeholder text
-					std::cout << "An epic battle between " << cards[cardToMove] << " and " << cards[board[pos[0]][pos[1]]] << " occurs here! \n";
-				}
-				board[pos[0]][pos[1]] = cardToMove;
 
-				printBoard(board);
+					battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
+
+					if (cardstats[cardToMove][0] > 0) {
+						
+						if (townTurn) {
+							for (int i = 0; i < 3; i++) {
+								if (terrHand[i] == board[pos[0]][pos[1]]) {
+									terrHand[i] = drawCards(hasBeenPulled, false);
+
+									if (terrHand[i] != -1) {
+										hasBeenPulled[terrHand[i]] = true;
+										board[3][11] = terrHand[i];
+									}
+								}
+								
+							}
+						}
+						else {
+							for (int i = 0; i < 3; i++) {
+								if (townHand[i] == board[pos[0]][pos[1]]) {
+									townHand[i] = drawCards(hasBeenPulled, false);
+
+									if (townHand[i] != -1) {
+										hasBeenPulled[townHand[i]] = true;
+										board[3][1] = townHand[i];
+									}
+								}
+
+							}
+
+						}
+						
+						board[pos[0]][pos[1]] = cardToMove;
+						printBoard(board);
+					}
+					else {
+						if (townTurn) {
+							for (int i = 0; i < 3; i++) {
+								if (townHand[i] == cardToMove) {
+									townHand[i] = drawCards(hasBeenPulled, false);
+
+									if (townHand[i] != -1) {
+										hasBeenPulled[townHand[i]] = true;
+										board[3][1] = townHand[i];
+									}
+								}
+
+							}
+						}
+						else {
+							for (int i = 0; i < 3; i++) {
+								if (terrHand[i] == cardToMove) {
+									terrHand[i] = drawCards(hasBeenPulled, false);
+
+									if (terrHand[i] != -1) {
+										hasBeenPulled[terrHand[i]] = true;
+										board[3][1] = terrHand[i];
+									}
+								}
+
+							}
+
+						}
+
+						printBoard(board);
+					}
+				}
+				else {
+					board[pos[0]][pos[1]] = cardToMove;
+
+					printBoard(board);
+				}
+				
 
 				movesRemaining--;
 			}
@@ -759,11 +950,15 @@ int main()
 				selectSpecial:
 				if (townTurn)
 				{
-					specialCard = SpecialActionSelect(townHand, townTurn);
+					specialCard = SpecialActionSelect(townHand, cards, townTurn);
 				}
 				else
 				{
-					specialCard = SpecialActionSelect(terrHand, townTurn);
+					specialCard = SpecialActionSelect(terrHand, cards, townTurn);
+				}
+
+				if (specialCard == -1) {
+					goto selectSpecial;
 				}
 				std::cout << "\n" << specialCard << "\n";
 				int cardReference = specialCard;
@@ -781,7 +976,121 @@ int main()
 				}
 				else if (specialCard < 6)
 				{
-					//speed function call
+					bool trapped;
+					for (int i = 0; i < 7; i++) {
+						for (int j = 0; j < 13; j++) {
+							if (board[i][j] == cardReference) {
+
+								pos[0] = i;
+								pos[1] = j;
+							}
+						}
+					}
+
+					trapped = checkIfTrapped(board, pos, townTurn);
+
+					if (!trapped) {
+						direction = getMoveDirection(pos, board, townTurn);
+
+						board[pos[0]][pos[1]] = 18;
+						switch (direction) {
+						case 1:
+							pos[0] = pos[0] - 1;
+							break;
+
+						case 2:
+							pos[1] = pos[1] - 1;
+							break;
+
+						case 3:
+							pos[1] = pos[1] + 1;
+							break;
+
+						default:
+							pos[0] = pos[0] + 1;
+							break;
+						}
+
+						if (board[pos[0]][pos[1]] != 18) {
+
+							battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
+
+							if (cardstats[cardReference][0] > 0) {
+
+								if (townTurn) {
+									for (int i = 0; i < 3; i++) {
+										if (terrHand[i] == board[pos[0]][pos[1]]) {
+											terrHand[i] = drawCards(hasBeenPulled, false);
+
+											if (terrHand[i] != -1) {
+												hasBeenPulled[terrHand[i]] = true;
+												board[3][11] = terrHand[i];
+											}
+										}
+
+									}
+								}
+								else {
+									for (int i = 0; i < 3; i++) {
+										if (townHand[i] == board[pos[0]][pos[1]]) {
+											townHand[i] = drawCards(hasBeenPulled, false);
+
+											if (townHand[i] != -1) {
+												hasBeenPulled[townHand[i]] = true;
+												board[3][1] = townHand[i];
+											}
+										}
+
+									}
+
+								}
+
+								board[pos[0]][pos[1]] = cardReference;
+								printBoard(board);
+							}
+							else {
+								if (townTurn) {
+									for (int i = 0; i < 3; i++) {
+										if (townHand[i] == cardReference) {
+											townHand[i] = drawCards(hasBeenPulled, false);
+
+											if (townHand[i] != -1) {
+												hasBeenPulled[townHand[i]] = true;
+												board[3][1] = townHand[i];
+											}
+										}
+
+									}
+								}
+								else {
+									for (int i = 0; i < 3; i++) {
+										if (terrHand[i] == cardReference) {
+											terrHand[i] = drawCards(hasBeenPulled, false);
+
+											if (terrHand[i] != -1) {
+												hasBeenPulled[terrHand[i]] = true;
+												board[3][1] = terrHand[i];
+											}
+										}
+
+									}
+
+								}
+
+								printBoard(board);
+							}
+						}
+						else {
+							board[pos[0]][pos[1]] = cardReference;
+
+							printBoard(board);
+						}
+
+					}
+					else {
+						std::cout << "This card cannot currently be moved \n";
+						goto selectSpecial;
+					}
 				}
 				else
 				{
@@ -829,113 +1138,4 @@ int main()
 
 }
 
-
-
-
-
-
-/*// CombatSystem.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include <iostream>
-#include <time.h>
-#include <cstdlib>
-#include <windows.h>
-int rollDice();//function designed to simulate a dice roll
-void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength);//function designed to simulate a battle between two cards
-void SetColor(int);
-int main()
-{
-	int doctorHealth = 4;//test case
-	int doctorStrength = 3;//test case
-
-	int witchHealth = 4;//test case
-	int witchStrength = 3;//test case
-
-	battle(doctorHealth, doctorStrength, witchHealth, witchStrength);//function is called here
-
-}
-int rollDice()
-{
-	int diceFacingUp;//elaborate variable name to avoid plagiarism
-	srand(time(0)+rand());//not exactly sure what's goingg on here but it works.
-
-	diceFacingUp = rand() % 7;//ensures that the random number is between 0 and 6
-	while (diceFacingUp == 0)//if the value of diceFacingUp is 0, it will be rerolled until it is not zero
-	{
-		diceFacingUp = rand() % 7;
-	}
-	return diceFacingUp;
-}
-
-void SetColor(int value)
-{
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
-}
-
-void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength)
-{
-	//card1 represents the cards of the player who initiated the battle
-	//card2 represents the cards of the player who is being attacked
-	//the stats of the player who initiated the battle should always be written in the first 2 parameters(CONTINUED)
-	//while the stats of the player being attacked should be written in the last 2 parameters
-	bool p1Attacking = true;//used to decide which player is rolling the dice.
-	bool p2Attacking = false;//used to decide which player is rolling the dice.
-	bool battleEnd = false;
-	int diceRoll;
-	while (battleEnd == false)
-	{
-		if (p1Attacking == true)
-		{
-			SetColor(11);
-			diceRoll = rollDice();
-			std::cout << "Player 1's Turn\n";
-			std::cout << "Number rolled: " << diceRoll << "\n";
-			if (diceRoll >= card2Strength)//checks to see if the number rolled by the player is greater or equal to the opposing card's strength
-			{
-				card2Health -= 1;
-				std::cout << "Card1 deals damage to Card2\n";
-				std::cout << "Card1 health: " << card1Health << " Card1 Strength: " << card1Strength << "\n";
-				std::cout << "Card2 health: " << card2Health << " Card2 Strength: " << card2Strength << "\n";
-			}
-			else
-			{
-				std::cout << "No damage done\n";
-			}
-			p1Attacking = false;
-			p2Attacking = true;
-		}
-		else if (p2Attacking == true)
-		{
-			SetColor(5);
-			diceRoll = rollDice();
-			std::cout << "Player 2's Turn\n";
-			std::cout << "Number rolled: " << diceRoll << "\n";
-			if (diceRoll >= card1Strength)
-			{
-				card1Health -= 1;
-				std::cout << "Card2 deals damage to Card1\n";
-				std::cout << "Card1 health: " << card1Health << " Card1 Strength: " << card1Strength << "\n";
-				std::cout << "Card2 health: " << card2Health << " Card2 Strength: " << card2Strength << "\n";
-			}
-			else
-			{
-				std::cout << "No damage done\n";
-			}
-			p1Attacking = true;
-			p2Attacking = false;
-		}
-		if (card1Health <= 0)
-		{
-			std::cout << "Player2 wins\n";
-			battleEnd = true;
-		}
-		if (card2Health <= 0)
-		{
-			std::cout << "Player1 wins\n";
-			battleEnd = true;
-		}
-	}
-}
-*/
 
