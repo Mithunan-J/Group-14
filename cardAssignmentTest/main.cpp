@@ -82,6 +82,28 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 			}
 			
 			diceRoll = rollDice();
+			if (townTurn)
+			{
+				if (card1boost)
+				{
+					if (diceRoll != 6)
+					{
+						diceRoll += 1;
+					}
+				}
+				card1boost = false;
+			}
+			else if (!townTurn)
+			{
+				if (card1boost)
+				{
+					if (diceRoll != 6)
+					{
+						diceRoll += 1;
+					}
+				}
+				card1boost = false;
+			}
 			std::cout << "Player 1's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
 			if (diceRoll >= card2Strength)//checks to see if the number rolled by the player is greater or equal to the opposing card's strength
@@ -108,6 +130,28 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 			}
 
 			diceRoll = rollDice();
+			if (townTurn)
+			{
+				if (card1boost)
+				{
+					if (diceRoll != 6)
+					{
+						diceRoll += 1;
+					}
+				}
+				card1boost = false;
+			}
+			else if (!townTurn)
+			{
+				if (card1boost)
+				{
+					if (diceRoll != 6)
+					{
+						diceRoll += 1;
+					}
+				}
+				card1boost = false;
+			}
 			std::cout << "Player 2's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
 			if (diceRoll >= card1Strength)
