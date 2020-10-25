@@ -21,7 +21,7 @@ void clear(int y) {
 void wipeText() {
 	clear(8);
 	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 30; j++) {
+		for (int j = 0; j < 35; j++) {
 			std::cout << ("   ");
 		}
 		std::cout << '\n';
@@ -60,7 +60,7 @@ void SetColor(int value)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
 }
 
-void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength, bool townTurn)
+void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength, bool townTurn, bool& card1boost, bool& card2boost)
 {
 	//card1 represents the cards of the player who initiated the battle
 	//card2 represents the cards of the player who is being attacked
@@ -1222,8 +1222,12 @@ int main()
 					wipeText();
 
 					if (board[pos[0]][pos[1]] != 18) {
-
-						battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn);
+						if (townTurn) {
+							battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn, townBoost, terrBoost);
+						}
+						else {
+							battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn, terrBoost, townBoost);
+						}
 
 						if (cardstats[cardToMove][0] > 0) {
 						
@@ -1365,7 +1369,12 @@ int main()
 
 							if (board[pos[0]][pos[1]] != 18) {
 
-								battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn);
+								if (townTurn) {
+									battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn, townBoost, terrBoost);
+								}
+								else {
+									battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn, terrBoost, townBoost);
+								}
 
 								if (cardstats[cardReference][0] > 0) {
 
