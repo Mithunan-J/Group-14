@@ -201,7 +201,10 @@ int main()
 {
 	std::string ask;
 	int hold = 1;
-	cout << "Townies and Terrors" << endl << endl;
+	std::cout << "___  _, _  _ _, _ _ __,  _,        _, _, _ __,         ___ __, __, __,  _, __,  _, \n" <<
+		" |  / \\ |  | |\\ | | |_  (_        /_\\ |\\ | | \\          |  |_  |_) |_) / \\ |_) (_ \n" <<
+		" |  \\ / |/\\| | \\| | |   , )       | | | \\| |_/          |  |   | \\ | \\ \\ / | \\ , ) \n" <<
+		" ~   ~  ~  ~ ~  ~ ~ ~~~  ~        ~ ~ ~  ~ ~            ~  ~~~ ~ ~ ~ ~  ~  ~ ~  ~ \n \n";
 
 	//asks users where they would like to go
 	cout << "Please enter where you would like to go" << endl;
