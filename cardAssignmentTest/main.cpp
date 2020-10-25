@@ -5,10 +5,46 @@
 #include <cstdlib>
 
 
+void clear(int y) {
+	HANDLE hconsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO IpCursor;
+	IpCursor.bVisible = false;
+	IpCursor.dwSize = 1;
+	SetConsoleCursorInfo(hconsole, &IpCursor);
+
+	std::cout.flush();
+	COORD coord = { (SHORT)0, (SHORT)y };
+	SetConsoleCursorPosition(hconsole, coord);
+}
+
+void wipeText() {
+	clear(8);
+	for (int i = 0; i < 20; i++) {
+		for (int j = 0; j < 30; j++) {
+			std::cout << ("   ");
+		}
+		std::cout << '\n';
+	}
+	clear(8);
+}
+
+
+void wipeScreen() {
+	clear(0);
+	for (int i = 0; i < 25; i++) {
+		for (int j = 0; j < 30; j++) {
+			std::cout << ("   ");
+		}
+		std::cout << '\n';
+	}
+	clear(0);
+
+}
+
 int rollDice()
 {
 	int diceFacingUp;//elaborate variable name to avoid plagiarism
-	srand(time(0) + rand());//not exactly sure what's goingg on here but it works.
+	srand(time(0) + rand());
 
 	diceFacingUp = rand() % 7;//ensures that the random number is between 0 and 6
 	while (diceFacingUp == 0)//if the value of diceFacingUp is 0, it will be rerolled until it is not zero
@@ -23,7 +59,7 @@ void SetColor(int value)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
 }
 
-void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength)
+void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength, bool townTurn)
 {
 	//card1 represents the cards of the player who initiated the battle
 	//card2 represents the cards of the player who is being attacked
@@ -37,7 +73,13 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 	{
 		if (p1Attacking == true)
 		{
-			SetColor(11);
+			if (townTurn) {
+				SetColor(11);
+			}
+			else {
+				SetColor(5);
+			}
+			
 			diceRoll = rollDice();
 			std::cout << "Player 1's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
@@ -57,7 +99,13 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 		}
 		else if (p2Attacking == true)
 		{
-			SetColor(5);
+			if (townTurn) {
+				SetColor(5);
+			}
+			else {
+				SetColor(11);
+			}
+
 			diceRoll = rollDice();
 			std::cout << "Player 2's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
@@ -85,6 +133,10 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 			std::cout << "Player1 wins\n";
 			battleEnd = true;
 		}
+
+		std::cout << "Press any key to continue\n";
+		int input = _getch();
+		wipeText();
 	}
 }
 
@@ -383,13 +435,20 @@ bool PowerMove(int cardReference, bool hasBoosted)
 {
 	if (!hasBoosted)
 	{
+		std::cout << "You will get a +1 bonus on your next attack roll!\n";
 		hasBoosted = true;
 	}
+	else {
+		std::cout << "You have already used this ability! You can use it again after a fight.\n";
+	}
+
+	std::cout << "Press any key to continue\n";
+	int input = _getch();
 	//if true, stength boost will add one at the end of next roll then be set to false
 	return hasBoosted;
 }
 
-//speed special action function goes here
+
 
 int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::string cards[18])
 {
@@ -437,11 +496,12 @@ int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::str
 
 	if (!canBeHealed[select])
 	{
-		std::cout << "\nThis action cannot be preformed on this card, please select another.\n";
+		std::cout << "This action cannot be preformed on this card, please select another.\n";
 		goto reheal;
 	}
 	else 
 	{
+		std::cout << "Healing " << cards[select];
 		return hand[select];
 	}
 
@@ -613,7 +673,9 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 	}
 }
 
-
+//this method determines where to place a new character
+//it tries to place the character as close as possible to the player's side of the board
+//kinda gross but if you have a prettier way of doing this i'm all ears
 void getSpawnLoc(int& y, int& x, int board[7][13], bool townTurn) {
 	if(townTurn){
 		if (board[3][1] == 18) {
@@ -680,7 +742,6 @@ void getSpawnLoc(int& y, int& x, int board[7][13], bool townTurn) {
 
 //this funtion returns the value of the card the player wishes to move
 //this card must be in the player's hand and be able to move in at least one direction on the board
-//this function WILL need modification later someone please remind me
 int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool townTurn) {
 	bool canSelect[3]{ false };
 	int input;
@@ -705,6 +766,7 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 
 		input = _getch();
 		input = input - 49;
+		wipeText();
 
 		if (input < 0 || input > 2|| canSelect[input] == false) {
 			goto getInput;
@@ -731,6 +793,8 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 
 	return cardVal;
 }
+
+
 
 //this procedure is what is says on the box
 //symbols 0-17 are characters
@@ -789,6 +853,154 @@ void printBoard(int board[7][13], bool townTurn) {
 
 }
 
+void placeWalls(int& sq1, int& sq2, int& sq3, int& sq4, int& sq5, int& sq6, int& sq7, int& sq8, int& sq9, int& sq10, int board[7][13], bool townTurn) {
+	int input;
+
+	if (townTurn) {
+		std::cout << "Townie player, ";
+	}
+	else {
+		std::cout << "Terror player, ";
+	}
+
+	for (int i = 0; i < 3; i++) {
+	selectSquare:
+		
+		std::cout << "enter the number of the square you wish to place a wall on:\n";
+		std::cout << " [1][2]\n";
+		std::cout << " [3][4]\n";
+		std::cout << " [5][6]\n";
+		std::cout << " [7][8]\n";
+		std::cout << " [9][0]\n";
+
+		input = _getch();
+		input -= 48;
+		wipeText();
+		if (input < 10 && input > -1) {
+			switch (input) {
+			case 1:
+				if (sq1 == 18) {
+					sq1 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 2:
+				if (sq2 == 18) {
+					sq2 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 3:
+				if (sq3 == 18) {
+					sq3 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 4:
+				if (sq4 == 18) {
+					sq4 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 5:
+				if (sq5 == 18) {
+					sq5 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 6:
+				if (sq6 == 18) {
+					sq6 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 7:
+				if (sq7 == 18) {
+					sq7 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 8:
+				if (sq8 == 18) {
+					sq8 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			case 9:
+				if (sq9 == 18) {
+					sq9 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+				break;
+
+			default:
+				if (sq10 == 18) {
+					sq10 = 19;
+					std::cout << "Wall " << i + 1 << " of 3 placed!\n";
+				}
+				else {
+					std::cout << "There is already a wall there!\n";
+					goto selectSquare;
+				}
+			}
+
+		}
+		else {
+			std::cout << "Invalid Entry. Try again";
+			goto selectSquare;
+		}
+		
+		wipeScreen();
+		printBoard(board, townTurn);
+	}
+
+}
+
+
 //will randomly draw a card of the specified faction
 //if boolean is true, a townie card value will be drawn
 //if boolean is false, a terror card will be drawn
@@ -832,6 +1044,8 @@ int main()
 {
 
 	menu();
+
+	wipeScreen();
 	//variables
 
 	//lists for character cards and their stats
@@ -926,9 +1140,14 @@ int main()
 	std::cout << "\n\nThe Townies move first (they start on the left side of the board)\n\n";
 	SetColor(11);
 
+	//has both players place three walls
+	placeWalls(board[1][4], board[1][5], board[2][4], board[2][5], board[3][4], board[3][5], board[4][4], board[4][5], board[5][4], board[5][5], board, true);
+	SetColor(5);
+	placeWalls(board[1][7], board[1][8], board[2][7], board[2][8], board[3][7], board[3][8], board[4][7], board[4][8], board[5][7], board[5][8], board, false);
+	SetColor(11);
 
-	//action function
-	//relocate this inside whatever menu thing you've got going
+
+	//main gameplay loop! hooray!
 
 	while (!terrHandEmpty && !townHandEmpty) {
 		
@@ -948,6 +1167,7 @@ int main()
 			}
 
 			int actionInput = _getch();
+			wipeText();
 			actionInput -= 48;
 
 			switch (actionInput) {
@@ -960,8 +1180,7 @@ int main()
 						cardToMove = selectCardToMove(terrHand, board, cards, false);
 					}
 
-					std::cout << cardToMove << "\n";
-
+					wipeText();
 
 					for (int i = 0; i < 7; i++) {
 						for (int j = 0; j < 13; j++) {
@@ -976,9 +1195,11 @@ int main()
 					board[pos[0]][pos[1]] = 18;
 					getMoveDirection(pos[0], pos[1], board, townTurn);
 
+					wipeText();
+
 					if (board[pos[0]][pos[1]] != 18) {
 
-						battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
+						battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn);
 
 						if (cardstats[cardToMove][0] > 0) {
 						
@@ -1015,6 +1236,7 @@ int main()
 							}
 						
 							board[pos[0]][pos[1]] = cardToMove;
+							wipeScreen();
 							printBoard(board, townTurn);
 						}
 						else {
@@ -1050,12 +1272,13 @@ int main()
 
 							}
 
+							wipeScreen();
 							printBoard(board, townTurn);
 						}
 					}
 					else {
 						board[pos[0]][pos[1]] = cardToMove;
-
+						wipeScreen();
 						printBoard(board, townTurn);
 					}
 				
@@ -1118,7 +1341,7 @@ int main()
 
 							if (board[pos[0]][pos[1]] != 18) {
 
-								battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
+								battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0], townTurn);
 
 								if (cardstats[cardReference][0] > 0) {
 
@@ -1247,6 +1470,19 @@ int main()
 			default:
 				std::cout << "Invalid input. Please try again. \n";
 			}
+
+			if(townTurn){
+				townHandEmpty = checkIfEmpty(townHand);
+				if (townHandEmpty) {
+					actionsOver = true;
+				}
+			}
+			else {
+				terrHandEmpty = checkIfEmpty(terrHand);
+				if (townHandEmpty) {
+					actionsOver = true;
+				}
+			}
 		}
 
 		actionsOver = false;
@@ -1261,7 +1497,7 @@ int main()
 			}
 		}
 		else {
-			std::cout << "The Terrors have defeated the Townies!\n";
+			std::cout << "The Terrors have triumphed over the Townies!\n";
 		}
 
 
