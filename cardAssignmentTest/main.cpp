@@ -325,7 +325,7 @@ beginning:
 		}
 		else if (ask == 51)
 		{
-			
+			std::cout << "\n\nThank you for playing Townies and Terrors.\n\n";
 			exit(1);
 		}
 		else
@@ -735,7 +735,8 @@ int selectCardToMove(int hand[3], int board[7][13], std::string cards[18], bool 
 //this procedure is what is says on the box
 //symbols 0-17 are characters
 //the remaining symbols are used to indicate spaces that can or cannot be occupied
-void printBoard(int board[7][13]) {
+void printBoard(int board[7][13], bool townTurn) {
+	SetColor(15);
 	std::string symbols[22];
 	symbols[0] = "AM";//amalgam
 	symbols[1] = "WO";//wolfman
@@ -776,6 +777,14 @@ void printBoard(int board[7][13]) {
 			}
 		}
 		std::cout << "\n";
+	}
+	if (townTurn)
+	{
+		SetColor(11);
+	}
+	else
+	{
+		SetColor(5);
 	}
 
 }
@@ -913,8 +922,9 @@ int main()
 		board[i + 2][10] = terrHand[i];
 	}
 	//i hope this procedure doesn't require an explanation
-	printBoard(board);
-	
+	printBoard(board, townTurn);
+	std::cout << "\n\nThe Townies move first (they start on the left side of the board)\n\n";
+	SetColor(11);
 
 
 	//action function
@@ -1005,7 +1015,7 @@ int main()
 							}
 						
 							board[pos[0]][pos[1]] = cardToMove;
-							printBoard(board);
+							printBoard(board, townTurn);
 						}
 						else {
 							if (townTurn) {
@@ -1040,13 +1050,13 @@ int main()
 
 							}
 
-							printBoard(board);
+							printBoard(board, townTurn);
 						}
 					}
 					else {
 						board[pos[0]][pos[1]] = cardToMove;
 
-						printBoard(board);
+						printBoard(board, townTurn);
 					}
 				
 
@@ -1145,7 +1155,7 @@ int main()
 									}
 
 									board[pos[0]][pos[1]] = cardReference;
-									printBoard(board);
+									printBoard(board, townTurn);
 								}
 								else {
 									if (townTurn) {
@@ -1180,13 +1190,13 @@ int main()
 
 									}
 
-									printBoard(board);
+									printBoard(board, townTurn);
 								}
 							}
 							else {
 								board[pos[0]][pos[1]] = cardReference;
 
-								printBoard(board);
+								printBoard(board, townTurn);
 							}
 
 						}
@@ -1257,9 +1267,11 @@ int main()
 
 		if (townTurn) {
 			townTurn = false;
+			SetColor(5);
 		}
 		else {
 			townTurn = true;
+			SetColor(11);
 		}
 	}
 
