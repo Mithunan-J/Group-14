@@ -420,9 +420,21 @@ int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::str
 			std::cout << count + 1 << ": This card is performing the special action and cannot be selected" << "\n";
 		}
 	}
+
+	std::cout << "Press 4 to go back\n";
+
 	int select;
 	select = _getch();
 	select -= 49;
+
+	if (select < 0 || select > 3) {
+		goto reheal;
+	}
+	
+	if (select == 3) {
+		return -1;
+	}
+
 	if (!canBeHealed[select])
 	{
 		std::cout << "\nThis action cannot be preformed on this card, please select another.\n";
@@ -444,6 +456,25 @@ void SupportMove(int& supportCard, int& patient)
 }
 
 
+bool checkIfEmpty(int hand[3]) {
+	if (hand[0] == -1) {
+		if (hand[1] == -1) {
+			if (hand[2] == -1) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
 //this function checks to see if the specified position (NOT the values around it) is unavaillable
 //it returns false if it is availlable and true if it is not
 bool checkSingleDirection(int pos[2], int board[7][13], bool townTurn) {
@@ -458,7 +489,7 @@ bool checkSingleDirection(int pos[2], int board[7][13], bool townTurn) {
 		}
 	}
 	else {
-		if (board[pos[0]][pos[1]] < 9 || board[pos[0]][pos[1]] == 18) {
+		if ((board[pos[0]][pos[1]] < 9 || board[pos[0]][pos[1]] == 18) && pos[1] != 1 && pos[1] != 12) {
 			return false;
 		}
 		else {
@@ -470,9 +501,10 @@ bool checkSingleDirection(int pos[2], int board[7][13], bool townTurn) {
 
 //this function gets the direction in which the player wishes to move
 //it makes sure the character can move in the selected direction before returning the direction
-int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
+void getMoveDirection(int& y, int& x, int board[7][13], bool townTurn) {
 	int input;
 	bool invalid = true;
+	int pos[2]{ y, x }; 
 	std::cout << "Enter a direction: \n";
 	std::cout << "1: UP\n";
 	std::cout << "2: LEFT\n";
@@ -488,6 +520,10 @@ int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
 		case 1:
 			pos[0] -= 1;
 			invalid = checkSingleDirection(pos, board, townTurn);
+			
+			if (!invalid) {
+				y -= 1;
+			}
 			pos[0] += 1;
 
 			break;
@@ -495,6 +531,10 @@ int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
 		case 2:
 			pos[1] -= 1;
 			invalid = checkSingleDirection(pos, board, townTurn);
+			
+			if (!invalid) {
+				x -= 1;
+			}
 			pos[1] += 1;
 
 			break;
@@ -502,6 +542,10 @@ int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
 		case 3:
 			pos[1] += 1;
 			invalid = checkSingleDirection(pos, board, townTurn);
+			
+			if (!invalid) {
+				x += 1;
+			}
 			pos[1] -= 1;
 
 			break;
@@ -509,6 +553,10 @@ int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
 		case 4:
 			pos[0] += 1;
 			invalid = checkSingleDirection(pos, board, townTurn);
+			
+			if (!invalid) {
+				y += 1;
+			}
 			pos[0] -= 1;
 
 			break;
@@ -517,9 +565,6 @@ int getMoveDirection(int pos[2], int board[7][13], bool townTurn) {
 			std::cout << "Invalid input. Please select a valid direction\n";
 		}
 	}
-
-	return input;
-
 }
 
 //this function checks to see if a certain character is unable to move
@@ -540,7 +585,7 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 		else if ((board[pos[0]][pos[1] - 1] < 9 || board[pos[0]][pos[1] - 1] == 18) && pos[1]!= 2) {
 			return false;
 		}
-		else if ((board[pos[0]][pos[1] + 1] < 9 || board[pos[0]][pos[1] + 1] == 18) && pos[1] < 11) {
+		else if ((board[pos[0]][pos[1] + 1] < 9 || board[pos[0]][pos[1] + 1] == 18) && pos[1]!= 11) {
 			return false;
 		}
 		else if (board[pos[0] + 1][pos[1]] < 9 || board[pos[0] + 1][pos[1]] == 18) {
@@ -566,6 +611,71 @@ bool checkIfTrapped(int board[7][13], int pos[2], bool townTurn) {
 			return true;
 		}
 	}
+}
+
+
+void getSpawnLoc(int& y, int& x, int board[7][13], bool townTurn) {
+	if(townTurn){
+		if (board[3][1] == 18) {
+			y = 3;
+			x = 1;
+		}
+		else if (board[3][2] == 18) {
+			y = 3;
+			x = 2;
+		}
+		else if (board[2][2] == 18) {
+			y = 2;
+			x = 2;
+		}
+		else if (board[4][2] == 18) {
+			y = 4; 
+			x = 2;
+		}
+		else if (board[3][3] == 18) {//at this point, you are doing a horrible job at the game
+			y = 3;
+			x = 3;
+		}
+		else if (board[2][3] == 18) {
+			y = 2;
+			x = 3;
+		}
+		else {
+			y = 4;
+			x = 3;
+		}
+	}
+	else {
+		if (board[3][12] == 18) {
+			y = 3;
+			x = 12;
+		}
+		else if (board[3][11] == 18) {
+			y = 3;
+			x = 11;
+		}
+		else if (board[2][11] == 18) {
+			y = 2;
+			x = 11;
+		}
+		else if (board[4][11] == 18) {
+			y = 4;
+			x = 11;
+		}
+		else if (board[3][10] == 18) {//at this point, you are doing a horrible job at the game
+			y = 3;
+			x = 10;
+		}
+		else if (board[2][10] == 18) {
+			y = 2;
+			x = 10;
+		}
+		else {
+			y = 4;
+			x = 10;
+		}
+	}
+	
 }
 
 //this funtion returns the value of the card the player wishes to move
@@ -776,14 +886,16 @@ int main()
 	int pos[2];
 	int direction = 0;
 	int cardToMove;
-	bool townTurn = true; //can change as needed, this is a default
+	bool townTurn = true;
 	int townHand[3];
 	int terrHand[3];
 	int movesRemaining = 3;
-	bool hasUsedSpecial = false;//default, feel free to modify/replace
+	bool hasUsedSpecial = false;
 	bool actionsOver = false;
 	bool townBoost = false;
 	bool terrBoost = false;
+	bool townHandEmpty = false;
+	bool terrHandEmpty = false;
 
 
 	//setup game
@@ -807,179 +919,43 @@ int main()
 
 	//action function
 	//relocate this inside whatever menu thing you've got going
-	while (!actionsOver) {
-		std::cout << "Press 1 to move one of your troops\n";
-		std::cout << "Press 2 to use a Special Action\n";
-		if (movesRemaining == 0) {
-			std::cout << "Press 3 to end your turn\n";
+
+	while (!terrHandEmpty && !townHandEmpty) {
+		
+		if (townTurn) {
+			std::cout << "\nTownie's Turn\n";
+		}
+		else {
+			std::cout << "\nTerror's Turn\n";
 		}
 
-		int actionInput = _getch();
-		actionInput -= 48;
+		while (!actionsOver) {
+			turnOptions:
+			std::cout << "Press 1 to move one of your troops\n";
+			std::cout << "Press 2 to use a Special Action\n";
+			if (movesRemaining == 0) {
+				std::cout << "Press 3 to end your turn\n";
+			}
 
-		switch (actionInput) {
-		case 1:
-			if (movesRemaining > 0) {
-				if (townTurn) {
-					cardToMove = selectCardToMove(townHand, board, cards, true);
-				}
-				else {
-					cardToMove = selectCardToMove(terrHand, board, cards, false);
-				}
+			int actionInput = _getch();
+			actionInput -= 48;
 
-				std::cout << cardToMove << "\n";
-
-
-				for (int i = 0; i < 7; i++) {
-					for (int j = 0; j < 13; j++) {
-						if (board[i][j] == cardToMove) {
-
-							pos[0] = i;
-							pos[1] = j;
-						}
-					}
-				}
-
-				direction = getMoveDirection(pos, board, townTurn);
-
-				board[pos[0]][pos[1]] = 18;
-				switch (direction) {
-				case 1:
-					pos[0] = pos[0] - 1;
-					break;
-
-				case 2:
-					pos[1] = pos[1] - 1;
-					break;
-
-				case 3:
-					pos[1] = pos[1] + 1;
-					break;
-
-				default:
-					pos[0] = pos[0] + 1;
-					break;
-				}
-
-				if (board[pos[0]][pos[1]] != 18) {
-
-					battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
-
-					if (cardstats[cardToMove][0] > 0) {
-						
-						if (townTurn) {
-							for (int i = 0; i < 3; i++) {
-								if (terrHand[i] == board[pos[0]][pos[1]]) {
-									terrHand[i] = drawCards(hasBeenPulled, false);
-
-									if (terrHand[i] != -1) {
-										hasBeenPulled[terrHand[i]] = true;
-										board[3][11] = terrHand[i];
-									}
-								}
-								
-							}
-						}
-						else {
-							for (int i = 0; i < 3; i++) {
-								if (townHand[i] == board[pos[0]][pos[1]]) {
-									townHand[i] = drawCards(hasBeenPulled, false);
-
-									if (townHand[i] != -1) {
-										hasBeenPulled[townHand[i]] = true;
-										board[3][1] = townHand[i];
-									}
-								}
-
-							}
-
-						}
-						
-						board[pos[0]][pos[1]] = cardToMove;
-						printBoard(board);
+			switch (actionInput) {
+			case 1:
+				if (movesRemaining > 0) {
+					if (townTurn) {
+						cardToMove = selectCardToMove(townHand, board, cards, true);
 					}
 					else {
-						if (townTurn) {
-							for (int i = 0; i < 3; i++) {
-								if (townHand[i] == cardToMove) {
-									townHand[i] = drawCards(hasBeenPulled, false);
-
-									if (townHand[i] != -1) {
-										hasBeenPulled[townHand[i]] = true;
-										board[3][1] = townHand[i];
-									}
-								}
-
-							}
-						}
-						else {
-							for (int i = 0; i < 3; i++) {
-								if (terrHand[i] == cardToMove) {
-									terrHand[i] = drawCards(hasBeenPulled, false);
-
-									if (terrHand[i] != -1) {
-										hasBeenPulled[terrHand[i]] = true;
-										board[3][1] = terrHand[i];
-									}
-								}
-
-							}
-
-						}
-
-						printBoard(board);
+						cardToMove = selectCardToMove(terrHand, board, cards, false);
 					}
-				}
-				else {
-					board[pos[0]][pos[1]] = cardToMove;
 
-					printBoard(board);
-				}
-				
+					std::cout << cardToMove << "\n";
 
-				movesRemaining--;
-			}
-			else {
-				std::cout << "You have already used all of your availlable movement oppourtunities!\n";
-			}
-			break;
 
-		case 2:
-			if (!hasUsedSpecial) {
-				int specialCard;
-				selectSpecial:
-				if (townTurn)
-				{
-					specialCard = SpecialActionSelect(townHand, cards, townTurn);
-				}
-				else
-				{
-					specialCard = SpecialActionSelect(terrHand, cards, townTurn);
-				}
-
-				if (specialCard == -1) {
-					goto selectSpecial;
-				}
-				std::cout << "\n" << specialCard << "\n";
-				int cardReference = specialCard;
-				if (townTurn) { specialCard -= 9; }
-				if (specialCard < 3)
-				{
-					if (townTurn)
-					{
-						townBoost =  PowerMove(cardReference, townBoost);
-					}
-					else
-					{
-						terrBoost = PowerMove(cardReference, terrBoost);
-					}
-				}
-				else if (specialCard < 6)
-				{
-					bool trapped;
 					for (int i = 0; i < 7; i++) {
 						for (int j = 0; j < 13; j++) {
-							if (board[i][j] == cardReference) {
+							if (board[i][j] == cardToMove) {
 
 								pos[0] = i;
 								pos[1] = j;
@@ -987,155 +963,305 @@ int main()
 						}
 					}
 
-					trapped = checkIfTrapped(board, pos, townTurn);
+					board[pos[0]][pos[1]] = 18;
+					getMoveDirection(pos[0], pos[1], board, townTurn);
 
-					if (!trapped) {
-						direction = getMoveDirection(pos, board, townTurn);
+					if (board[pos[0]][pos[1]] != 18) {
 
-						board[pos[0]][pos[1]] = 18;
-						switch (direction) {
-						case 1:
-							pos[0] = pos[0] - 1;
-							break;
+						battle(cardstats[cardToMove][0], cardstats[cardToMove][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
 
-						case 2:
-							pos[1] = pos[1] - 1;
-							break;
+						if (cardstats[cardToMove][0] > 0) {
+						
+							if (townTurn) {
+								for (int i = 0; i < 3; i++) {
+									if (terrHand[i] == board[pos[0]][pos[1]]) {
+										terrHand[i] = drawCards(hasBeenPulled, false);
 
-						case 3:
-							pos[1] = pos[1] + 1;
-							break;
-
-						default:
-							pos[0] = pos[0] + 1;
-							break;
-						}
-
-						if (board[pos[0]][pos[1]] != 18) {
-
-							battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
-
-							if (cardstats[cardReference][0] > 0) {
-
-								if (townTurn) {
-									for (int i = 0; i < 3; i++) {
-										if (terrHand[i] == board[pos[0]][pos[1]]) {
-											terrHand[i] = drawCards(hasBeenPulled, false);
-
-											if (terrHand[i] != -1) {
-												hasBeenPulled[terrHand[i]] = true;
-												board[3][11] = terrHand[i];
-											}
+										if (terrHand[i] != -1) {
+											hasBeenPulled[terrHand[i]] = true;
+											int spawnLoc[2]{ 0 };
+											getSpawnLoc(spawnLoc[0], spawnLoc[1], board, false);
+											board[spawnLoc[0]][spawnLoc[1]] = terrHand[i];
 										}
-
 									}
+								
 								}
-								else {
-									for (int i = 0; i < 3; i++) {
-										if (townHand[i] == board[pos[0]][pos[1]]) {
-											townHand[i] = drawCards(hasBeenPulled, false);
-
-											if (townHand[i] != -1) {
-												hasBeenPulled[townHand[i]] = true;
-												board[3][1] = townHand[i];
-											}
-										}
-
-									}
-
-								}
-
-								board[pos[0]][pos[1]] = cardReference;
-								printBoard(board);
 							}
 							else {
-								if (townTurn) {
-									for (int i = 0; i < 3; i++) {
-										if (townHand[i] == cardReference) {
-											townHand[i] = drawCards(hasBeenPulled, false);
+								for (int i = 0; i < 3; i++) {
+									if (townHand[i] == board[pos[0]][pos[1]]) {
+										townHand[i] = drawCards(hasBeenPulled, true);
 
-											if (townHand[i] != -1) {
-												hasBeenPulled[townHand[i]] = true;
-												board[3][1] = townHand[i];
-											}
+										if (townHand[i] != -1) {
+											hasBeenPulled[townHand[i]] = true;
+											int spawnLoc[2]{ 0 };
+											getSpawnLoc(spawnLoc[0], spawnLoc[1], board, true);
+											board[spawnLoc[0]][spawnLoc[1]] = townHand[i];
 										}
-
-									}
-								}
-								else {
-									for (int i = 0; i < 3; i++) {
-										if (terrHand[i] == cardReference) {
-											terrHand[i] = drawCards(hasBeenPulled, false);
-
-											if (terrHand[i] != -1) {
-												hasBeenPulled[terrHand[i]] = true;
-												board[3][1] = terrHand[i];
-											}
-										}
-
 									}
 
 								}
 
-								printBoard(board);
 							}
+						
+							board[pos[0]][pos[1]] = cardToMove;
+							printBoard(board);
 						}
 						else {
-							board[pos[0]][pos[1]] = cardReference;
+							if (townTurn) {
+								for (int i = 0; i < 3; i++) {
+									if (townHand[i] == cardToMove) {
+										townHand[i] = drawCards(hasBeenPulled, true);
+
+										if (townHand[i] != -1) {
+											hasBeenPulled[townHand[i]] = true;
+											int spawnLoc[2]{ 0 };
+											getSpawnLoc(spawnLoc[0], spawnLoc[1], board, true);
+											board[spawnLoc[0]][spawnLoc[1]] = townHand[i];
+										}
+									}
+
+								}
+							}
+							else {
+								for (int i = 0; i < 3; i++) {
+									if (terrHand[i] == cardToMove) {
+										terrHand[i] = drawCards(hasBeenPulled, false);
+
+										if (terrHand[i] != -1) {
+											hasBeenPulled[terrHand[i]] = true;
+											int spawnLoc[2]{ 0 };
+											getSpawnLoc(spawnLoc[0], spawnLoc[1], board, false);
+											board[spawnLoc[0]][spawnLoc[1]] = terrHand[i];
+										}
+									}
+
+								}
+
+							}
 
 							printBoard(board);
 						}
-
 					}
 					else {
-						std::cout << "This card cannot currently be moved \n";
-						goto selectSpecial;
+						board[pos[0]][pos[1]] = cardToMove;
+
+						printBoard(board);
 					}
+				
+
+					movesRemaining--;
 				}
-				else
-				{
-					
+				else {
+					std::cout << "You have already used all of your availlable movement oppourtunities!\n";
+				}
+				break;
+
+			case 2:
+				if (!hasUsedSpecial) {
+					int specialCard;
+					selectSpecial:
 					if (townTurn)
 					{
-						int patient = ChoosePatient(cardstats, townHand, cardReference, cards);
-						if (patient == -1)
-						{
-							goto selectSpecial;
-						}
-						SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
+						specialCard = SpecialActionSelect(townHand, cards, townTurn);
 					}
 					else
 					{
-						int patient = ChoosePatient(cardstats, terrHand, cardReference, cards);
-						if (patient == -1)
+						specialCard = SpecialActionSelect(terrHand, cards, townTurn);
+					}
+
+					if (specialCard == -1) {
+						goto turnOptions;
+					}
+					std::cout << "\n" << specialCard << "\n";
+					int cardReference = specialCard;
+					if (townTurn) { specialCard -= 9; }
+					if (specialCard < 3)
+					{
+						if (townTurn)
 						{
+							townBoost =  PowerMove(cardReference, townBoost);
+						}
+						else
+						{
+							terrBoost = PowerMove(cardReference, terrBoost);
+						}
+					}
+					else if (specialCard < 6)
+					{
+						bool trapped;
+						for (int i = 0; i < 7; i++) {
+							for (int j = 0; j < 13; j++) {
+								if (board[i][j] == cardReference) {
+
+									pos[0] = i;
+									pos[1] = j;
+								}
+							}
+						}
+
+						trapped = checkIfTrapped(board, pos, townTurn);
+
+						if (!trapped) {
+							board[pos[0]][pos[1]] = 18;
+							getMoveDirection(pos[0], pos[1], board, townTurn);
+
+							if (board[pos[0]][pos[1]] != 18) {
+
+								battle(cardstats[cardReference][0], cardstats[cardReference][1], cardstats[board[pos[0]][pos[1]]][0], cardstats[board[pos[0]][pos[1]]][0]);
+
+								if (cardstats[cardReference][0] > 0) {
+
+									if (townTurn) {
+										for (int i = 0; i < 3; i++) {
+											if (terrHand[i] == board[pos[0]][pos[1]]) {
+												terrHand[i] = drawCards(hasBeenPulled, false);
+
+												if (terrHand[i] != -1) {
+													hasBeenPulled[terrHand[i]] = true;
+													int spawnLoc[2]{ 0 };
+													getSpawnLoc(spawnLoc[0], spawnLoc[1], board, false);
+													board[spawnLoc[0]][spawnLoc[1]] = terrHand[i];
+												}
+											}
+
+										}
+									}
+									else {
+										for (int i = 0; i < 3; i++) {
+											if (townHand[i] == board[pos[0]][pos[1]]) {
+												townHand[i] = drawCards(hasBeenPulled, true);
+
+												if (townHand[i] != -1) {
+													hasBeenPulled[townHand[i]] = true;
+													int spawnLoc[2]{ 0 };
+													getSpawnLoc(spawnLoc[0], spawnLoc[1], board, true);
+													board[spawnLoc[0]][spawnLoc[1]] = townHand[i];
+												}
+											}
+
+										}
+
+									}
+
+									board[pos[0]][pos[1]] = cardReference;
+									printBoard(board);
+								}
+								else {
+									if (townTurn) {
+										for (int i = 0; i < 3; i++) {
+											if (townHand[i] == cardReference) {
+												townHand[i] = drawCards(hasBeenPulled, true);
+
+												if (townHand[i] != -1) {
+													hasBeenPulled[townHand[i]] = true;
+													int spawnLoc[2]{ 0 };
+													getSpawnLoc(spawnLoc[0], spawnLoc[1], board, true);
+													board[spawnLoc[0]][spawnLoc[1]] = townHand[i];
+												}
+											}
+
+										}
+									}
+									else {
+										for (int i = 0; i < 3; i++) {
+											if (terrHand[i] == cardReference) {
+												terrHand[i] = drawCards(hasBeenPulled, false);
+
+												if (terrHand[i] != -1) {
+													hasBeenPulled[terrHand[i]] = true;
+													int spawnLoc[2]{ 0 };
+													getSpawnLoc(spawnLoc[0], spawnLoc[1], board, false);
+													board[spawnLoc[0]][spawnLoc[1]] = terrHand[i];
+												}
+											}
+
+										}
+
+									}
+
+									printBoard(board);
+								}
+							}
+							else {
+								board[pos[0]][pos[1]] = cardReference;
+
+								printBoard(board);
+							}
+
+						}
+						else {
+							std::cout << "This card cannot currently be moved \n";
 							goto selectSpecial;
 						}
-						SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
 					}
+					else
+					{
+					
+						if (townTurn)
+						{
+							int patient = ChoosePatient(cardstats, townHand, cardReference, cards);
+							if (patient == -1)
+							{
+								goto selectSpecial;
+							}
+							SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
+						}
+						else
+						{
+							int patient = ChoosePatient(cardstats, terrHand, cardReference, cards);
+							if (patient == -1)
+							{
+								goto turnOptions;
+							}
+							SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
+						}
+					}
+					hasUsedSpecial = true;
 				}
-				hasUsedSpecial = true;
-			}
-			else {
-				std::cout << "You have already used your special action on this turn!\n";
-			}
-			break;
+				else {
+					std::cout << "You have already used your special action on this turn!\n";
+				}
+				break;
 
-		case 3:
-			if (movesRemaining == 0) {
-				std::cout << "Your turn is now over.\n";
-				actionsOver = true;
-			}
-			else {
-				std::cout << "You must move " << movesRemaining << " more time/s\n";
-			}
-			break;
+			case 3:
+				if (movesRemaining == 0) {
+					std::cout << "Your turn is now over.\n";
+					actionsOver = true;
+				}
+				else {
+					std::cout << "You must move " << movesRemaining << " more time/s\n";
+				}
+				break;
 
-		default:
-			std::cout << "Invalid input. Please try again. \n";
+			default:
+				std::cout << "Invalid input. Please try again. \n";
+			}
+		}
+
+		actionsOver = false;
+		movesRemaining = 3;
+		hasUsedSpecial = false;
+
+		townHandEmpty = checkIfEmpty(townHand);
+		if (!townHandEmpty) {
+			terrHandEmpty = checkIfEmpty(terrHand);
+			if (terrHandEmpty) {
+				std::cout << "The Townies have triumphed over the Terrors!\n";
+			}
+		}
+		else {
+			std::cout << "The Terrors have defeated the Townies!\n";
+		}
+
+
+		if (townTurn) {
+			townTurn = false;
+		}
+		else {
+			townTurn = true;
 		}
 	}
 
+
 }
-
-
