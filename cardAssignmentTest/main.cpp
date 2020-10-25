@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <cstdlib>
 
+void menu();
 
 void clear(int y) {
 	HANDLE hconsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -32,7 +33,7 @@ void wipeText() {
 void wipeScreen() {
 	clear(0);
 	for (int i = 0; i < 25; i++) {
-		for (int j = 0; j < 30; j++) {
+		for (int j = 0; j < 40; j++) {
 			std::cout << ("   ");
 		}
 		std::cout << '\n';
@@ -147,20 +148,20 @@ void story()
 	int type;
 	int persons;
 restartone:
-	std::cout << "Which would you like to see? \n \n 1: townies \n \n 2: terrors \n \n 3: return to menu \n";
+	std::cout << "Which would you like to see? \n \n1: Townies \n \n2: Terrors \n \n3: Return to Menu \n";
 
 	peoples = _getch();
 
 	if (peoples == 50)
 	{
 	restarttwo:
-		std::cout << "\n\nWhich type of Terror would you like to learn about?\n1: Power\n2: Speed\n3: Support\n\n";
+		std::cout << "\n\nWhich type of Terror would you like to learn about?\n \n1: Power\n \n2: Speed\n \n3: Support\n\n";
 		type = _getch();
 
 		if (type == 49)
 		{
 		restartthree:
-			std::cout << "\n\nWhich Terror would you like to learn about?\n1: Amalgam\n2: Wolfman\n3: Zombie\n\n";
+			std::cout << "\n\nWhich Terror would you like to learn about?\n \n1: Amalgam\n \n2: Wolfman\n \n3: Zombie\n\n";
 			persons = _getch(); //lets see
 
 			if (persons == 49)
@@ -188,7 +189,7 @@ restartone:
 		else if (type == 50)
 		{
 		restartfour:
-			std::cout << "\n\nWhich terror would you like to learn about?\n1: Vampire\n2: Ghost\n3: Shifter\n\n";
+			std::cout << "\n\nWhich terror would you like to learn about?\n \n1: Vampire\n \n2: Ghost\n \n3: Shifter\n\n";
 			persons = _getch();
 
 			if (persons == 49)
@@ -216,7 +217,7 @@ restartone:
 		else if (type == 51)
 		{
 		restartfive:
-			std::cout << "\n\nWhich Terror would you like to learn about?\n1: Reaper\n2: Banshee\n3: Witch\n\n";
+			std::cout << "\n\nWhich Terror would you like to learn about?\n \n1: Reaper\n\n2: Banshee\n\n3: Witch\n\n";
 			persons = _getch();
 
 			if (persons == 49)
@@ -249,13 +250,13 @@ restartone:
 	else if (peoples == 49)
 	{
 	restartsix:
-		std::cout << "\n\nWhich type of Townie would you like to learn about?\n1: Power\n2: Speed\n3: Support\n\n";
+		std::cout << "\n\nWhich type of Townie would you like to learn about?\n\n1: Power\n\n2: Speed\n\n3: Support\n\n";
 		type = _getch();
 
 		if (type == 49)
 		{
 		restartseven:
-			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Detective\n2: Lover\n3: Noble\n\n";
+			std::cout << "\n\nWhich Townie would you like to learn about?\n\n1: Detective\n\n2: Lover\n\n3: Noble\n\n";
 			persons = _getch();
 
 			if (persons == 49)
@@ -282,7 +283,7 @@ restartone:
 		else if (type == 50)
 		{
 		restarteight:
-			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Beauty\n2: Dancer\n3: Student\n\n";
+			std::cout << "\n\nWhich Townie would you like to learn about?\n\n1: Beauty\n\n2: Dancer\n\n3: Student\n\n";
 			persons = _getch();
 
 			if (persons == 49)
@@ -309,7 +310,7 @@ restartone:
 		else if (type == 51)
 		{
 		restartnine:
-			std::cout << "\n\nWhich Townie would you like to learn about?\n1: Scientist\n2: Mentor\n3: Doctor\n\n";
+			std::cout << "\n\nWhich Townie would you like to learn about?\n\n1: Scientist\n\n2: Mentor\n\n3: Doctor\n\n";
 			persons = _getch();
 
 			if (persons == 49)
@@ -351,15 +352,37 @@ restartone:
 	}
 } 
 
+void title()
+{
+	
+	int start;
+	int loop = 0;
+
+	
+	std::cout << " \n\n\n\n\n\n\n\n            ___  _, _  _ _, _ _ __,  _,          _, _, _ __,         ___ __, __, __,  _, __,  _, \n" <<
+		"             |  / \\ |  | |\\ | | |_  (_          /_\\ |\\ | | \\          |  |_  |_) |_) / \\ |_) (_ \n" <<
+		"             |  \\ / |/\\| | \\| | |   , )         | | | \\| |_/          |  |   | \\ | \\ \\ / | \\ , ) \n" <<
+		"             ~   ~  ~  ~ ~  ~ ~ ~~~  ~          ~ ~ ~  ~ ~            ~  ~~~ ~ ~ ~ ~  ~  ~ ~  ~ \n \n";
+
+	std::cout << "\n\n\n\n\n\n\n\n\n                                           Press Any Button \n\n\n\n\n\n\n";
+	
+	start = _getch();
+	while (start == ' \n') {
+		start = _getch();
+	}
+	wipeScreen();
+	menu();
+}
 void menu()
 {
 	int ask;
 	int hold = 1;
-	std::cout << "Townies and Terrors \n \n";
+	
+
 beginning:
 	//asks users where they would like to go
-	std::cout << "Please enter where you would like to go \n";
-	std::cout << "1: play \n \n 2: info  \n \n 3: quit \n";
+	std::cout << "Please enter where you would like to go \n\n";
+	std::cout << "1: play \n \n2: info  \n \n3: quit \n\n";
 	ask = _getch();
 
 	while (hold != 0)
@@ -382,7 +405,7 @@ beginning:
 		}
 		else
 		{
-			std::cout << "Please enter one of the options";
+			std::cout << "Please enter one of the options. \n\n";
 			ask = _getch();
 		}
 	}
@@ -1043,9 +1066,10 @@ int drawCards(bool hasBeenPulled[18], bool townTurn) {
 int main()
 {
 
-	menu();
+	title();
 
 	wipeScreen();
+
 	//variables
 
 	//lists for character cards and their stats
