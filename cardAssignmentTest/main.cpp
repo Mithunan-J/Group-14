@@ -60,7 +60,7 @@ void SetColor(int value)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), value);
 }
 
-void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2Strength, bool townTurn, bool& card1boost, bool& card2boost)
+void battle(int& card1Health, int card1Strength, int& card2Health, int card2Strength, bool townTurn, bool& card1boost, bool& card2boost)
 {
 	//card1 represents the cards of the player who initiated the battle
 	//card2 represents the cards of the player who is being attacked
@@ -82,28 +82,16 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 			}
 			
 			diceRoll = rollDice();
-			if (townTurn)
+			
+			if (card1boost)
 			{
-				if (card1boost)
+				if (diceRoll != 6)
 				{
-					if (diceRoll != 6)
-					{
-						diceRoll += 1;
-					}
+					diceRoll += 1;
 				}
-				card1boost = false;
 			}
-			else if (!townTurn)
-			{
-				if (card1boost)
-				{
-					if (diceRoll != 6)
-					{
-						diceRoll += 1;
-					}
-				}
 				card1boost = false;
-			}
+			
 			std::cout << "Player 1's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
 			if (diceRoll >= card2Strength)//checks to see if the number rolled by the player is greater or equal to the opposing card's strength
@@ -130,28 +118,15 @@ void battle(int& card1Health, int& card1Strength, int& card2Health, int& card2St
 			}
 
 			diceRoll = rollDice();
-			if (townTurn)
-			{
-				if (card1boost)
+				if (card2boost)
 				{
 					if (diceRoll != 6)
 					{
 						diceRoll += 1;
 					}
 				}
-				card1boost = false;
-			}
-			else if (!townTurn)
-			{
-				if (card1boost)
-				{
-					if (diceRoll != 6)
-					{
-						diceRoll += 1;
-					}
-				}
-				card1boost = false;
-			}
+				card2boost = false;
+			
 			std::cout << "Player 2's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
 			if (diceRoll >= card1Strength)
