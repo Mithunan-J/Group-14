@@ -19,14 +19,14 @@ void clear(int y) {
 }
 
 void wipeText() {
-	clear(8);
+	clear(7);
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 35; j++) {
 			std::cout << ("   ");
 		}
 		std::cout << '\n';
 	}
-	clear(8);
+	clear(7);
 }
 
 
@@ -88,9 +88,10 @@ void battle(int& card1Health, int card1Strength, int& card2Health, int card2Stre
 				if (diceRoll != 6)
 				{
 					diceRoll += 1;
+					card1boost = false;
 				}
 			}
-				card1boost = false;
+				
 			
 			std::cout << "Player 1's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
@@ -123,9 +124,10 @@ void battle(int& card1Health, int card1Strength, int& card2Health, int card2Stre
 					if (diceRoll != 6)
 					{
 						diceRoll += 1;
+						card2boost = false;
 					}
 				}
-				card2boost = false;
+				
 			
 			std::cout << "Player 2's Turn\n";
 			std::cout << "Number rolled: " << diceRoll << "\n";
@@ -439,7 +441,7 @@ int SpecialActionSelect(int hand[3], std::string cards[18], bool townTurn)
 	int select;
 
 enterChoice:
-	std::cout << "\n\nWhich card will perform the special action?\n";
+	std::cout << "Which card will perform the special action?\n";
 	for (int i = 0; i < 3; i++) {
 		if (hand[i] > -1) {
 			std::cout << i + 1 << ": " << cards[hand[i]] << "\n";
@@ -538,12 +540,12 @@ int ChoosePatient(int cardstats[18][3], int hand[3], int cardReference, std::str
 
 	if (!canBeHealed[select])
 	{
-		std::cout << "This action cannot be preformed on this card, please select another.\n";
+		std::cout << "This action cannot be performed on this card, please select another.\n";
 		goto reheal;
 	}
 	else 
 	{
-		std::cout << "Healing " << cards[select];
+		std::cout << "Healing " << cards[hand[select]] << "\n";
 		return hand[select];
 	}
 
@@ -555,6 +557,11 @@ void SupportMove(int& supportCard, int& patient)
 {
 	supportCard--;
 	patient++;
+
+	std::cout << "Patient has been healed! Press any key to continue";
+	int input;
+	input = _getch();
+
 }
 
 
@@ -1195,10 +1202,10 @@ int main()
 	while (!terrHandEmpty && !townHandEmpty) {
 		
 		if (townTurn) {
-			std::cout << "\nTownie's Turn\n";
+			std::cout << "\Townie's Turn\n";
 		}
 		else {
-			std::cout << "\nTerror's Turn\n";
+			std::cout << "\Terror's Turn\n";
 		}
 
 		while (!actionsOver) {
@@ -1349,11 +1356,14 @@ int main()
 					{
 						specialCard = SpecialActionSelect(terrHand, cards, townTurn);
 					}
-
+					
+					wipeText();
+					
 					if (specialCard == -1) {
+						
 						goto turnOptions;
 					}
-					std::cout << "\n" << specialCard << "\n";
+
 					int cardReference = specialCard;
 					if (townTurn) { specialCard -= 9; }
 					if (specialCard < 3)
@@ -1366,6 +1376,7 @@ int main()
 						{
 							terrBoost = PowerMove(cardReference, terrBoost);
 						}
+						wipeText();
 					}
 					else if (specialCard < 6)
 					{
@@ -1430,6 +1441,7 @@ int main()
 									}
 
 									board[pos[0]][pos[1]] = cardReference;
+									wipeScreen();
 									printBoard(board, townTurn);
 								}
 								else {
@@ -1464,19 +1476,22 @@ int main()
 										}
 
 									}
-
+									wipeScreen();
 									printBoard(board, townTurn);
 								}
 							}
 							else {
 								board[pos[0]][pos[1]] = cardReference;
-
+								wipeScreen();
 								printBoard(board, townTurn);
 							}
 
 						}
 						else {
-							std::cout << "This card cannot currently be moved \n";
+							std::cout << "This card cannot currently be moved. Press any key to go back\n";
+							int input;
+							input = _getch();
+							wipeText();
 							goto selectSpecial;
 						}
 					}
@@ -1486,6 +1501,7 @@ int main()
 						if (townTurn)
 						{
 							int patient = ChoosePatient(cardstats, townHand, cardReference, cards);
+							wipeText();
 							if (patient == -1)
 							{
 								goto selectSpecial;
@@ -1495,12 +1511,15 @@ int main()
 						else
 						{
 							int patient = ChoosePatient(cardstats, terrHand, cardReference, cards);
+							wipeText();
 							if (patient == -1)
 							{
 								goto turnOptions;
 							}
 							SupportMove(cardstats[cardReference][0], cardstats[patient][0]);
 						}
+
+						wipeText();
 					}
 					hasUsedSpecial = true;
 				}
@@ -1511,8 +1530,10 @@ int main()
 
 			case 3:
 				if (movesRemaining == 0) {
-					std::cout << "Your turn is now over.\n";
+					std::cout << "Your turn is now over. Press any key to continue\n";
+					int input = _getch();
 					actionsOver = true;
+					wipeText();
 				}
 				else {
 					std::cout << "You must move " << movesRemaining << " more time(s)\n";
